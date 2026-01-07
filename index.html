@@ -160,6 +160,30 @@ if ("serviceWorker" in navigator) {
                     .sort((a, b) => a.date - b.date)
                     .slice(0, 5);
             }, [collectionDates]);
+            const alertItem = useMemo(() => {
+  if (upcomingDates.length === 0) return null;
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const next = upcomingDates[0].date;
+  const nextDate = new Date(next);
+  nextDate.setHours(0,0,0,0);
+
+  if (nextDate.getTime() === today.getTime()) {
+    return { ...upcomingDates[0], when: 'today' };
+  }
+
+  if (nextDate.getTime() === tomorrow.getTime()) {
+    return { ...upcomingDates[0], when: 'tomorrow' };
+  }
+
+  return null;
+}, [upcomingDates]);
+
 
             const getWasteColor = (type) => {
                 const colors = {
