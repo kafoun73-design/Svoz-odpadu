@@ -328,6 +328,15 @@ if ("serviceWorker" in navigator) {
                         )
                     ),
                     selectedStreet && React.createElement(React.Fragment, null,
+                                                          alertItem && React.createElement('div', {
+  className: 'mb-4 p-4 rounded-lg text-white font-semibold',
+  style: { backgroundColor: getWasteColor(alertItem.type) }
+},
+  alertItem.when === 'today'
+    ? `Dnes se sváží ${alertItem.name}`
+    : `Zítra se sváží ${alertItem.name}`
+),
+
                         upcomingDates.length > 0 && React.createElement('div', { className: 'bg-white rounded-lg shadow-lg p-4 md:p-6 mb-6' },
                             React.createElement('h2', { className: 'text-xl font-bold mb-4 flex items-center gap-2' },
                                 React.createElement(Calendar, { className: 'w-6 h-6 text-green-600' }),
