@@ -35,7 +35,10 @@ if ("serviceWorker" in navigator) {
         );
 
         const WasteCollectionApp = () => {
-            const [selectedStreet, setSelectedStreet] = useState('');
+            const [selectedStreet, setSelectedStreet] = useState(
+  localStorage.getItem('selectedStreet') || ''
+);
+
             const [selectedWasteType, setSelectedWasteType] = useState('all');
             const [currentMonthOffset, setCurrentMonthOffset] = useState(0);
 
