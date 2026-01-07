@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Svoz odpadu 2026</title>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        const Trash2 = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+        );
+
+        const Calendar = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        );
+
+        const WasteCollectionApp = () => {
+            const [selectedStreet, setSelectedStreet] = useState('');
+            const [selectedWasteType, setSelectedWasteType] = useState('all');
+            const [currentMonthOffset, setCurrentMonthOffset] = useState(0);
+
+            const streetGroups = {
+                tuesdayPlastic: ['Švermova', 'Vichrova', 'Havlínova', 'Fuksova', 'U Nové hospody', 'Škroupova', 'Sokolovská', 'Brožíkova', 'Na zemské stezce', 'Boženy Němcové', 'Nerudova', 'Dukelská', 'Hořejší', 'Mírová', 'Ke Kovoně', 'Ke Karlovu', 'K Závodišti', 'Dohalského', 'Husova', 'Na Vysoké mezi', 'Seifertova', 'Vojáčkova', 'Járy Cimrmana', 'Lidická', 'Družstevní', 'Karolíny Světlé', 'K Borku', 'Palackého', 'Kollárova', 'Králíčkova', 'Kafkova', 'Gen. Přikryla', 'Spojovací', 'Za Kruhovkou', 'Vrchlického', 'Ve Vilách', 'Ve Višňovce', 'Nová', 'Na Brůdku', 'Jiráskova', 'Dolejší', 'Na Staré Vsi', 'Dobrovského sady', 'Dvorce', 'Byšičky', 'Řehačka'],
+                wednesdayPlastic: ['Alešova', 'Blahoslavova', 'Brandlova', 'Braunova', 'Cihelna', 'Čapkova', 'Čechova', 'Čelakovského', 'Dvorecká', 'Dvořákova', 'Fibichova', 'Havlíčkovo náměstí', 'Hrabanov', 'Janulova', 'Jaromírovy sady', 'K bažantnici', 'Kaprova', 'Ke Skále', 'Ke Střelnici', 'Kpt. Jaroše', 'Kupkova', 'Lom', 'Máchova', 'Masarykova', 'Muchova', 'Na Rybníčku', 'Náměstí B. Hrozného', 'Pod Klášterem', 'Příčná', 'Raisova', 'Riegrova', 'Sadová', 'Sojovická', 'Stržiště', 'Šporkova', 'Tyršova', 'U Braňky', 'U Cihelny', 'U křížku', 'V Olších', 'V Polích', 'Ve Skále', 'Vojanova', 'Za Zámkem', 'Zámecká', 'Zámek', 'Žižkova', 'Brigádnická', 'Karlov', 'Klicperova', 'Lipová', 'Mladá', 'Na Mlíčníku', 'Okrsek', 'Poděbradova', 'Průmyslová', 'Růžová', 'Skupova', 'Tylova', 'U Okrouhlíku', 'V Zátiší', 'Za Koncem', '28. října', '9. května', 'Československé armády', 'Husovo náměstí', 'Jahodová', 'Jedličkova', 'Ke Vrutici', 'Komenského', 'Krátká', 'Křižíkova', 'Legionářská', 'Mánesova', 'Na Písku', 'Na Vlečce', 'Olbrachtova', 'Pivovarská', 'Přemyslova', 'Resslova', 'Rybízová', 'Slunéčkova', 'Smetanova', 'Sokolská', 'Šafaříkova', 'Šípková', 'Školní náměstí', 'Škrétova', 'Šmeralova', 'Třebízského', 'Třešňová', 'U Dráhy', 'U Nadjezdu', 'U Stadionu', 'Veleslavínova', 'Za Labem', 'Zahradní', 'K Milovicům', 'Luční', 'Na Homolce', 'Okružní', 'Sídliště', 'U Vodárny', 'Za Pávem'],
+                tuesdayMixed: ['Alešova', 'Blahoslavova', 'Brandlova', 'Braunova', 'Cihelna', 'Čapkova', 'Čechova', 'Čelakovského', 'Dvorecká', 'Dvořákova', 'Fibichova', 'Havlíčkovo náměstí', 'Hrabanov', 'Janulova', 'Jaromírovy sady', 'K bažantnici', 'Kaprova', 'Ke Skále', 'Ke Střelnici', 'Kpt. Jaroše', 'Kupkova', 'Lom', 'Máchova', 'Masarykova', 'Muchova', 'Na Rybníčku', 'Náměstí B. Hrozného', 'Pod Klášterem', 'Příčná', 'Raisova', 'Riegrova', 'Sadová', 'Sojovická', 'Stržiště', 'Šporkova', 'Tyršova', 'U Braňky', 'U Cihelny', 'U křížku', 'V Olších', 'V Polích', 'Ve Skále', 'Vojanova', 'Za Zámkem', 'Zámecká', 'Zámek', 'Žižkova', 'Ke Kovoně', 'Ke Karlovu', 'K Závodišti'],
+                wednesdayMixed: ['Byšičky', 'Řehačka', 'Dvorce', 'Brigádnická', 'Karlov', 'Klicperova', 'Lipová', 'Mladá', 'Na Mlíčníku', 'Okrsek', 'Poděbradova', 'Průmyslová', 'Růžová', 'Skupova', 'Tylova', 'U Okrouhlíku', 'V Zátiší', 'Za Koncem'],
+                thursdayMixed: ['Boženy Němcové', 'Brožíkova', '28. října', '9. května', 'Československé armády', 'Dobrovského sady', 'Dohalského', 'Dolejší', 'Družstevní', 'Dukelská', 'Fuksova', 'Gen. Přikryla', 'Havlínova', 'Hořejší', 'Husova', 'Husovo náměstí', 'Jahodová', 'Járy Cimrmana', 'Jedličkova', 'Jiráskova', 'K Borku', 'Kafkova', 'Ke Vrutici', 'Kollárova', 'Komenského', 'Králíčkova', 'Krátká', 'Křižíkova', 'Karolíny Světlé', 'Legionářská', 'Lidická', 'Mánesova', 'Mírová', 'Na Brůdku', 'Na Písku', 'Na Staré vsi', 'Na Vlečce', 'Na Vysoké mezi', 'Na Zemské stezce', 'Nerudova', 'Nová', 'Olbrachtova', 'Palackého', 'Pivovarská', 'Přemyslova', 'Resslova', 'Rybízová', 'Seifertova', 'Slunéčkova', 'Smetanova', 'Sokolovská', 'Sokolská', 'Spojovací', 'Šafaříkova', 'Šípková', 'Školní náměstí', 'Škrétova', 'Škroupova', 'Šmeralova', 'Švermova', 'Třebízského', 'Třešňová', 'U Dráhy', 'U Nadjezdu', 'U Nové hospody', 'U Stadionu', 'Ve Vilách', 'Ve Višňovce', 'Veleslavínova', 'Vichrova', 'Vojáčkova', 'Vrchlického', 'Za Kruhovkou', 'Za Labem', 'Zahradní'],
+                fridayMixed: ['K Milovicům', 'Luční', 'Na Homolce', 'Okružní', 'Sídliště', 'U Vodárny', 'Za Pávem']
+            };
+
+            const allStreets = useMemo(() => {
+                const streets = new Set();
+                Object.values(streetGroups).forEach(group => {
+                    group.forEach(street => streets.add(street));
+                });
+                return Array.from(streets).sort((a, b) => a.localeCompare(b, 'cs'));
+            }, []);
+
+            const wasteTypes = [
+                { id: 'all', name: 'Všechny typy', color: '#666' },
+                { id: 'plastic', name: 'Plast', color: '#FCD34D' },
+                { id: 'paper', name: 'Papír', color: '#60A5FA' },
+                { id: 'bio', name: 'Bioodpad', color: '#92400E' },
+                { id: 'mixed', name: 'Směsný odpad', color: '#1F2937' }
+            ];
+
+            const generateCollectionDates = (startDate, interval, endDate) => {
+                const dates = [];
+                let current = new Date(startDate);
+                const end = new Date(endDate);
+                
+                while (current <= end) {
+                    dates.push(new Date(current));
+                    current.setDate(current.getDate() + interval);
+                }
+                return dates;
+            };
+
+            const getCollectionDatesForStreet = (street, wasteType) => {
+                if (!street) return [];
+                
+                const dates = [];
+                const endDate = new Date(2026, 11, 31);
+
+                if (wasteType === 'all' || wasteType === 'plastic') {
+                    if (streetGroups.tuesdayPlastic.includes(street)) {
+                        generateCollectionDates('2026-01-27', 28, endDate).forEach(date => {
+                            dates.push({ date, type: 'plastic', name: 'Plast' });
+                        });
+                    } else if (streetGroups.wednesdayPlastic.includes(street)) {
+                        generateCollectionDates('2026-01-28', 28, endDate).forEach(date => {
+                            dates.push({ date, type: 'plastic', name: 'Plast' });
+                        });
+                    }
+                }
+
+                if (wasteType === 'all' || wasteType === 'paper') {
+                    if (streetGroups.tuesdayPlastic.includes(street)) {
+                        generateCollectionDates('2026-01-13', 28, endDate).forEach(date => {
+                            dates.push({ date, type: 'paper', name: 'Papír' });
+                        });
+                    } else if (streetGroups.wednesdayPlastic.includes(street)) {
+                        generateCollectionDates('2026-01-14', 28, endDate).forEach(date => {
+                            dates.push({ date, type: 'paper', name: 'Papír' });
+                        });
+                    }
+                }
+
+                if (wasteType === 'all' || wasteType === 'bio') {
+                    generateCollectionDates('2026-01-14', 14, endDate).forEach(date => {
+                        dates.push({ date, type: 'bio', name: 'Bioodpad' });
+                    });
+                }
+
+                if (wasteType === 'all' || wasteType === 'mixed') {
+                    if (streetGroups.tuesdayMixed.includes(street)) {
+                        generateCollectionDates('2026-01-06', 14, endDate).forEach(date => {
+                            dates.push({ date, type: 'mixed', name: 'Směsný odpad' });
+                        });
+                    } else if (streetGroups.wednesdayMixed.includes(street)) {
+                        generateCollectionDates('2026-01-07', 14, endDate).forEach(date => {
+                            dates.push({ date, type: 'mixed', name: 'Směsný odpad' });
+                        });
+                    } else if (streetGroups.thursdayMixed.includes(street)) {
+                        generateCollectionDates('2026-01-08', 14, endDate).forEach(date => {
+                            dates.push({ date, type: 'mixed', name: 'Směsný odpad' });
+                        });
+                    } else if (streetGroups.fridayMixed.includes(street)) {
+                        generateCollectionDates('2026-01-09', 14, endDate).forEach(date => {
+                            dates.push({ date, type: 'mixed', name: 'Směsný odpad' });
+                        });
+                    }
+                }
+
+                return dates;
+            };
+
+            const today = new Date();
+            const displayMonths = useMemo(() => {
+                const months = [];
+                for (let i = 0; i < 3; i++) {
+                    const date = new Date(today.getFullYear(), today.getMonth() + currentMonthOffset + i, 1);
+                    if (date.getFullYear() === 2026 && date.getMonth() <= 11) {
+                        months.push(date);
+                    }
+                }
+                return months;
+            }, [currentMonthOffset]);
+
+            const collectionDates = useMemo(() => {
+                return getCollectionDatesForStreet(selectedStreet, selectedWasteType);
+            }, [selectedStreet, selectedWasteType]);
+
+            const upcomingDates = useMemo(() => {
+                return collectionDates
+                    .filter(item => item.date >= today)
+                    .sort((a, b) => a.date - b.date)
+                    .slice(0, 5);
+            }, [collectionDates]);
+
+            const getWasteColor = (type) => {
+                const colors = {
+                    plastic: '#FCD34D',
+                    paper: '#60A5FA',
+                    bio: '#92400E',
+                    mixed: '#1F2937'
+                };
+                return colors[type];
+            };
+
+            const renderMonth = (monthDate) => {
+                const year = monthDate.getFullYear();
+                const month = monthDate.getMonth();
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDayOfWeek = (firstDay.getDay() + 6) % 7;
+
+                const monthNames = ['Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 
+                                   'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'];
+                const dayNames = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'];
+
+                const days = [];
+                
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                    days.push(React.createElement('div', { key: `empty-${i}`, className: 'h-16 md:h-20' }));
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const currentDate = new Date(year, month, day);
+                    
+                    const collections = collectionDates.filter(item => {
+                        return item.date.getFullYear() === currentDate.getFullYear() &&
+                               item.date.getMonth() === currentDate.getMonth() &&
+                               item.date.getDate() === currentDate.getDate();
+                    });
+
+                    const isToday = currentDate.toDateString() === today.toDateString();
+                    const hasCollections = collections.length > 0;
+                    const backgroundColor = hasCollections && collections.length === 1 
+                        ? getWasteColor(collections[0].type) 
+                        : 'white';
+
+                    days.push(
+                        React.createElement('div', {
+                            key: day,
+                            className: `h-16 md:h-20 border border-gray-300 relative overflow-hidden ${isToday ? 'ring-2 ring-blue-500' : ''}`,
+                            style: { backgroundColor: backgroundColor }
+                        },
+                            collections.length > 1 ? 
+                                React.createElement('div', { className: 'absolute inset-0 flex' },
+                                    collections.map((collection, idx) =>
+                                        React.createElement('div', {
+                                            key: idx,
+                                            className: 'flex-1',
+                                            style: { backgroundColor: getWasteColor(collection.type) },
+                                            title: collection.name
+                                        })
+                                    )
+                                ) : null,
+                            React.createElement('div', {
+                                className: `relative z-10 p-1 md:p-2 text-base md:text-xl font-bold ${hasCollections ? 'text-white' : 'text-gray-800'}`
+                            }, day)
+                        )
+                    );
+                }
+
+                return React.createElement('div', { className: 'bg-white rounded-lg shadow p-2 md:p-4' },
+                    React.createElement('h3', { className: 'text-lg md:text-xl font-bold mb-3 text-center' },
+                        `${monthNames[month]} ${year}`
+                    ),
+                    React.createElement('div', { className: 'grid grid-cols-7 gap-1' },
+                        dayNames.map(day =>
+                            React.createElement('div', {
+                                key: day,
+                                className: 'text-center font-semibold text-xs md:text-sm p-1 bg-gray-100'
+                            }, day)
+                        ),
+                        ...days
+                    )
+                );
+            };
+
+            return React.createElement('div', { className: 'min-h-screen bg-gray-50 p-2 md:p-6' },
+                React.createElement('div', { className: 'max-w-7xl mx-auto' },
+                    React.createElement('div', { className: 'bg-white rounded-lg shadow-lg p-4 md:p-6 mb-6' },
+                        React.createElement('div', { className: 'flex items-center gap-3 mb-6' },
+                            React.createElement(Trash2, { className: 'w-8 h-8 text-green-600' }),
+                            React.createElement('h1', { className: 'text-2xl md:text-3xl font-bold text-gray-800' },
+                                'Svoz odpadu 2026'
+                            )
+                        ),
+                        React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-4 mb-6' },
+                            React.createElement('div', null,
+                                React.createElement('label', { className: 'block text-sm font-medium text-gray-700 mb-2' },
+                                    'Vyberte ulici:'
+                                ),
+                                React.createElement('select', {
+                                    value: selectedStreet,
+                                    onChange: (e) => setSelectedStreet(e.target.value),
+                                    className: 'w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent'
+                                },
+                                    React.createElement('option', { value: '' }, '-- Vyberte ulici --'),
+                                    allStreets.map(street =>
+                                        React.createElement('option', { key: street, value: street }, street)
+                                    )
+                                )
+                            ),
+                            React.createElement('div', null,
+                                React.createElement('label', { className: 'block text-sm font-medium text-gray-700 mb-2' },
+                                    'Typ odpadu:'
+                                ),
+                                React.createElement('select', {
+                                    value: selectedWasteType,
+                                    onChange: (e) => setSelectedWasteType(e.target.value),
+                                    className: 'w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent'
+                                },
+                                    wasteTypes.map(type =>
+                                        React.createElement('option', { key: type.id, value: type.id }, type.name)
+                                    )
+                                )
+                            )
+                        ),
+                        React.createElement('div', { className: 'flex flex-wrap gap-4 mb-4 p-3 bg-gray-50 rounded' },
+                            React.createElement('div', { className: 'flex items-center gap-2' },
+                                React.createElement('div', { className: 'w-4 h-4 rounded-full', style: { backgroundColor: '#FCD34D' } }),
+                                React.createElement('span', { className: 'text-sm' }, 'Plast')
+                            ),
+                            React.createElement('div', { className: 'flex items-center gap-2' },
+                                React.createElement('div', { className: 'w-4 h-4 rounded-full', style: { backgroundColor: '#60A5FA' } }),
+                                React.createElement('span', { className: 'text-sm' }, 'Papír')
+                            ),
+                            React.createElement('div', { className: 'flex items-center gap-2' },
+                                React.createElement('div', { className: 'w-4 h-4 rounded-full', style: { backgroundColor: '#92400E' } }),
+                                React.createElement('span', { className: 'text-sm' }, 'Bioodpad')
+                            ),
+                            React.createElement('div', { className: 'flex items-center gap-2' },
+                                React.createElement('div', { className: 'w-4 h-4 rounded-full', style: { backgroundColor: '#1F2937' } }),
+                                React.createElement('span', { className: 'text-sm' }, 'Směsný odpad')
+                            )
+                        )
+                    ),
+                    selectedStreet && React.createElement(React.Fragment, null,
+                        upcomingDates.length > 0 && React.createElement('div', { className: 'bg-white rounded-lg shadow-lg p-4 md:p-6 mb-6' },
+                            React.createElement('h2', { className: 'text-xl font-bold mb-4 flex items-center gap-2' },
+                                React.createElement(Calendar, { className: 'w-6 h-6 text-green-600' }),
+                                'Nejbližší termíny svozu'
+                            ),
+                            React.createElement('div', { className: 'space-y-2' },
+                                upcomingDates.map((item, idx) =>
+                                    React.createElement('div', { key: idx, className: 'flex items-center gap-3 p-3 bg-gray-50 rounded' },
+                                        React.createElement('div', {
+                                            className: 'w-4 h-4 rounded-full flex-shrink-0',
+                                            style: { backgroundColor: getWasteColor(item.type) }
+                                        }),
+                                        React.createElement('div', { className: 'flex-1' },
+                                            React.createElement('span', { className: 'font-semibold' }, item.name)
+                                        ),
+                                        React.createElement('div', { className: 'text-right' },
+                                            React.createElement('div', { className: 'font-medium' },
+                                                item.date.toLocaleDateString('cs-CZ', { weekday: 'short', day: 'numeric', month: 'numeric' })
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-3 gap-4' },
+                            displayMonths.map((monthDate, idx) =>
+                                React.createElement('div', { key: idx }, renderMonth(monthDate))
+                            )
+                        )
+                    ),
+                    !selectedStreet && React.createElement('div', { className: 'bg-white rounded-lg shadow-lg p-8 text-center' },
+                        React.createElement(Trash2, { className: 'w-16 h-16 text-gray-300 mx-auto mb-4' }),
+                        React.createElement('p', { className: 'text-gray-500 text-lg' },
+                            'Vyberte ulici pro zobrazení termínů svozu'
+                        )
+                    )
+                )
+            );
+        };
+
+        ReactDOM.render(
+            React.createElement(WasteCollectionApp),
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
